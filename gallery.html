@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VIP Digital Gallery | Yam Pictures</title>
+    
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    
+    <!-- JSZip Library (For downloading all photos as ZIP) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+    <script>
+        const savedTheme = localStorage.getItem('yam-theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    </script>
+
+    <style>
+        /* GLOBAL VARIABLES */
+        :root {
+            --bg-color: #020203; --glass-bg: rgba(255, 255, 255, 0.02); --glass-border: rgba(212, 175, 55, 0.15);
+            --text-main: #ffffff; --text-muted: #888890; --gold-primary: #d4af37; --gold-light: #f3dca3; --nav-bg: rgba(2, 2, 3, 0.85);
+        }
+        :root[data-theme="light"] {
+            --bg-color: #fafbfc; --glass-bg: rgba(255, 255, 255, 0.8); --glass-border: rgba(212, 175, 55, 0.3);
+            --text-main: #111111; --text-muted: #666666; --gold-primary: #b8901a; --nav-bg: rgba(250, 251, 252, 0.9);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Manrope', sans-serif; overflow-x: hidden; transition: 0.5s ease; min-height: 100vh; }
+        
+        /* HEADER */
+        header { position: fixed; top: 0; width: 100%; padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; z-index: 1000; background: var(--nav-bg); backdrop-filter: blur(30px); border-bottom: 1px solid var(--glass-border); }
+        .brand-logo img { height: 35px; object-fit: contain; }
+        :root[data-theme="light"] .brand-logo img { filter: invert(1) brightness(0.2); }
+        .btn-logout { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gold-primary); text-decoration: none; border: 1px solid var(--gold-primary); padding: 10px 20px; border-radius: 30px; transition: 0.3s; }
+        .btn-logout:hover { background: var(--gold-primary); color: #000; box-shadow: 0 0 15px rgba(212, 175, 55, 0.4); }
+
+        /* HERO SECTION */
+        .gallery-hero { padding: 140px 5% 40px; text-align: center; position: relative; }
+        .gallery-hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(30px, 6vw, 55px); font-weight: 400; margin-bottom: 15px; letter-spacing: 1px; }
+        .gallery-hero p { color: var(--gold-primary); font-size: 13px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 25px; }
+        
+        /* ZIP DOWNLOAD BUTTON */
+        .btn-zip { display: inline-flex; align-items: center; gap: 10px; padding: 12px 25px; background: var(--glass-bg); backdrop-filter: blur(10px); border: 1px solid var(--gold-primary); color: var(--text-main); border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn-zip:hover { background: var(--gold-primary); color: #000; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2); }
+        .btn-zip svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; }
+        .btn-zip:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* LOADER */
+        .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 0; }
+        .spinner { width: 50px; height: 50px; border: 2px solid transparent; border-top-color: var(--gold-primary); border-right-color: var(--gold-primary); border-radius: 50%; animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite; margin-bottom: 20px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* MASONRY GRID */
+        .gallery-container { padding: 30px 5% 120px; max-width: 1600px; margin: 0 auto; min-height: 50vh; }
+        
+        .masonry-grid { column-count: 4; column-gap: 20px; }
+        @media (max-width: 1200px) { .masonry-grid { column-count: 3; } }
+        @media (max-width: 850px) { .masonry-grid { column-count: 2; column-gap: 15px; } }
+        @media (max-width: 480px) { .masonry-grid { column-count: 1; } }
+
+        .masonry-item {
+            break-inside: avoid; margin-bottom: 20px; border-radius: 16px;
+            overflow: hidden; position: relative; cursor: pointer;
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            transform: translateY(30px); opacity: 0; animation: fadeUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); transition: all 0.5s ease;
+        }
+        
+        .masonry-item img { width: 100%; display: block; object-fit: cover; transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .masonry-item:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(212, 175, 55, 0.15); border-color: var(--gold-primary); z-index: 2; }
+        .masonry-item:hover img { transform: scale(1.05); }
+        
+        /* Hover Overlay & Action Buttons */
+        .item-overlay {
+            position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.8) 100%);
+            opacity: 0; transition: opacity 0.4s ease; display: flex; align-items: flex-end; justify-content: space-between; padding: 20px;
+        }
+        .masonry-item:hover .item-overlay { opacity: 1; }
+        
+        .view-text { color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; transform: translateY(15px); opacity: 0; transition: 0.4s ease 0.1s; }
+        .masonry-item:hover .view-text { transform: translateY(0); opacity: 1; }
+
+        .actions-group { display: flex; gap: 10px; }
+        .icon-btn { background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border: 1px solid var(--gold-primary); color: var(--gold-primary); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; transform: translateY(15px); opacity: 0; }
+        .masonry-item:hover .icon-btn { transform: translateY(0); opacity: 1; }
+        .masonry-item:hover .icon-btn:nth-child(2) { transition-delay: 0.1s; }
+        .icon-btn:hover { background: var(--gold-primary); color: #000; transform: scale(1.1) !important; }
+        .icon-btn svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* LIGHTBOX */
+        .lightbox { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.98); z-index: 2000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; backdrop-filter: blur(15px); }
+        .lightbox.active { opacity: 1; pointer-events: all; }
+        .lightbox-content { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .lightbox img { max-width: 90%; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 30px 60px rgba(0,0,0,0.8); transform: scale(0.95); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); user-select: none; }
+        .lightbox.active img { transform: scale(1); }
+        
+        .nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; backdrop-filter: blur(10px); z-index: 2001; }
+        .nav-btn:hover { background: var(--gold-primary); border-color: var(--gold-primary); color: #000; }
+        .nav-btn svg { width: 24px; height: 24px; stroke: currentColor; stroke-width: 2; fill: none; }
+        .prev-btn { left: 20px; } .next-btn { right: 20px; }
+        
+        .close-btn { position: absolute; top: 20px; right: 20px; background: transparent; border: none; color: #fff; cursor: pointer; padding: 10px; transition: 0.3s; z-index: 2001; }
+        .close-btn:hover { color: var(--gold-primary); transform: rotate(90deg) scale(1.2); }
+        .close-btn svg { width: 30px; height: 30px; stroke: currentColor; stroke-width: 1.5; }
+
+        .lb-counter { position: absolute; top: 30px; left: 30px; color: var(--gold-primary); font-size: 13px; font-weight: 700; letter-spacing: 3px; z-index: 2001; text-transform: uppercase; }
+
+        .error-state { text-align: center; padding: 100px 20px; display: none; }
+        .error-state h2 { color: #ff4757; font-family: 'Playfair Display', serif; margin-bottom: 15px; font-size: 40px; }
+
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            .nav-btn { width: 40px; height: 40px; }
+            .prev-btn { left: 10px; } .next-btn { right: 10px; }
+            .lightbox img { max-width: 100%; max-height: 75vh; border-radius: 0; }
+            .lb-counter { top: 20px; left: 20px; } .close-btn { top: 10px; right: 10px; }
+            .gallery-hero { padding-top: 100px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="brand-logo"><img src="assets/yam-logo.png" alt="Yam Pictures"></a>
+        <div style="display:flex;gap:10px;align-items:center"><a href="index.html" class="btn-logout">Home</a><a href="gallery-login.html" class="btn-logout">Close Gallery</a></div>
+    </header>
+
+    <section class="gallery-hero">
+        <h1 id="album-title">Curating Memories...</h1>
+        <p id="album-id-display">Connecting to secure vault</p>
+        
+        <!-- ZIP Download Button -->
+        <button id="zip-btn" class="btn-zip" onclick="downloadAllZip()" style="display: none;">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Download Entire Album (ZIP)
+        </button>
+    </section>
+
+    <div id="loader" class="loader-container">
+        <div class="spinner"></div>
+        <p style="color: var(--text-muted); font-size: 11px; letter-spacing: 3px; text-transform: uppercase;">Fetching from Cloud...</p>
+    </div>
+
+    <div id="error-state" class="error-state">
+        <h2>Album Not Found</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">We couldn't find any photos for this ID.</p>
+        <a href="gallery-login.html" class="btn-logout">Try Another Code</a>
+    </div>
+
+    <main class="gallery-container">
+        <div id="masonry-grid" class="masonry-grid"></div>
+    </main>
+
+    <div id="lightbox" class="lightbox">
+        <div class="lb-counter"><span id="lb-current">1</span> / <span id="lb-total">0</span></div>
+        <button class="close-btn" onclick="closeLightbox()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
+        <button class="nav-btn prev-btn" onclick="prevPhoto(event)"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+        <div class="lightbox-content" onclick="closeLightbox()">
+            <img id="lightbox-img" src="" alt="Fullscreen Image" onclick="event.stopPropagation()">
+        </div>
+        <button class="nav-btn next-btn" onclick="nextPhoto(event)"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const clientId = urlParams.get('id');
+        
+        const loader = document.getElementById('loader');
+        const grid = document.getElementById('masonry-grid');
+        const errorState = document.getElementById('error-state');
+        const albumTitle = document.getElementById('album-title');
+        const albumIdDisplay = document.getElementById('album-id-display');
+        const zipBtn = document.getElementById('zip-btn');
+
+        let currentPhotos = [];
+        let currentIndex = 0;
+
+        async function fetchTelegramAlbum() {
+            if (!clientId) { showError(); return; }
+
+            try {
+                // 🔴 የአንተ API
+                const API_URL = `https://yam-api.epocadia.workers.dev/api/album/${clientId}`; 
+                
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error("Not found");
+                const data = await response.json();
+                
+                if(data.images && data.images.length > 0) {
+                    currentPhotos = data.images; 
+                    albumTitle.innerText = "The " + clientId + " Collection";
+                    albumIdDisplay.innerText = `${data.images.length} High-Res Memories`;
+                    zipBtn.style.display = 'inline-flex'; // ዚፕ ዳውንሎድ በተኑን ያሳያል
+                    renderImages(data.images); 
+                } else {
+                    showError();
+                }
+            } catch (error) {
+                showError();
+            }
+        }
+
+        function renderImages(imageUrls) {
+            loader.style.display = 'none';
+            document.getElementById('lb-total').innerText = imageUrls.length;
+            
+            imageUrls.forEach((originalUrl, index) => {
+                const item = document.createElement('div');
+                item.className = 'masonry-item';
+                item.style.animationDelay = `${index * 0.1}s`; 
+                
+                // 🔴 SMART COMPRESSION: ፎቶው ቶሎ እና በትንሽ ዳታ እንዲከፈት Proxy ይጠቀማል (ለእይታ ብቻ)
+                const compressedUrl = `https://wsrv.nl/?url=${encodeURIComponent(originalUrl)}&w=600&output=webp&q=70`;
+                const fileName = `Yam_Pictures_${clientId}_${index + 1}.jpg`;
+
+                item.innerHTML = `
+                    <img src="${compressedUrl}" alt="Yam Pictures VIP" onclick="openLightbox(${index})" loading="lazy">
+                    <div class="item-overlay" onclick="openLightbox(${index})">
+                        <span class="view-text">View Image</span>
+                        <div class="actions-group">
+                            <!-- Share Button -->
+                            <a href="#" class="icon-btn" onclick="sharePhoto('${originalUrl}', '${fileName}', event)" title="Share Photo">
+                                <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
+                            </a>
+                            <!-- Download Button (Original Quality) -->
+                            <a href="#" class="icon-btn" onclick="forceDownload('${originalUrl}', '${fileName}', event)" title="Download High-Res">
+                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(item);
+            });
+        }
+
+        // =====================================
+        // ORIGINAL JPG DOWNLOAD
+        // =====================================
+        async function forceDownload(url, filename, event) {
+            event.preventDefault(); event.stopPropagation();
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`;
+            btn.style.animation = "spin 1s linear infinite";
+
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                a.download = filename; 
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                a.remove();
+            } catch (err) {
+                alert("Download failed. Check connection.");
+            } finally {
+                btn.style.animation = "none"; btn.innerHTML = originalHTML;
+            }
+        }
+
+        // =====================================
+        // NATIVE SHARE (WhatsApp, Telegram, etc)
+        // =====================================
+        async function sharePhoto(url, filename, event) {
+            event.preventDefault(); event.stopPropagation();
+            
+            if (navigator.share) {
+                try {
+                    // ፎቶውን እንደ ፋይል አውርዶ ሼር ያደርገዋል (እንደ ሊንክ አይደለም)
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const file = new File([blob], filename, { type: "image/jpeg" });
+                    
+                    await navigator.share({
+                        title: 'My VIP Photo',
+                        text: 'Look at this beautiful memory captured by Yam Pictures!',
+                        files: [file]
+                    });
+                } catch (err) {
+                    console.log('Share cancelled');
+                }
+            } else {
+                navigator.clipboard.writeText(url);
+                alert("Link copied! Your browser doesn't support direct file sharing.");
+            }
+        }
+
+        // =====================================
+        // DOWNLOAD ALL AS ZIP
+        // =====================================
+        async function downloadAllZip() {
+            zipBtn.disabled = true;
+            const originalText = zipBtn.innerHTML;
+            zipBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Zipping Photos... Please Wait`;
+
+            try {
+                const zip = new JSZip();
+                const folder = zip.folder(`Yam_Pictures_${clientId}_Album`);
+                
+                for(let i = 0; i < currentPhotos.length; i++) {
+                    zipBtn.innerHTML = `Downloading ${i+1} of ${currentPhotos.length}...`;
+                    const response = await fetch(currentPhotos[i]);
+                    const blob = await response.blob();
+                    folder.file(`Yam_Pictures_${clientId}_${i + 1}.jpg`, blob);
+                }
+                
+                zipBtn.innerHTML = `Compressing File...`;
+                const content = await zip.generateAsync({ type: "blob" });
+                
+                const blobUrl = window.URL.createObjectURL(content);
+                const a = document.createElement("a");
+                a.href = blobUrl;
+                a.download = `Yam_Pictures_${clientId}_Full_Album.zip`;
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                a.remove();
+            } catch (err) {
+                alert("Error creating ZIP file. Please try downloading photos individually.");
+            } finally {
+                zipBtn.innerHTML = originalText;
+                zipBtn.disabled = false;
+            }
+        }
+
+        // =====================================
+        // LIGHTBOX
+        // =====================================
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lbCurrent = document.getElementById('lb-current');
+
+        function openLightbox(index) {
+            currentIndex = index;
+            updateLightboxImage();
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            setTimeout(() => { lightboxImg.src = ""; }, 400); 
+        }
+
+        function nextPhoto(e) { if(e) e.stopPropagation(); currentIndex = (currentIndex + 1) % currentPhotos.length; updateLightboxImage(); }
+        function prevPhoto(e) { if(e) e.stopPropagation(); currentIndex = (currentIndex - 1 + currentPhotos.length) % currentPhotos.length; updateLightboxImage(); }
+
+        function updateLightboxImage() {
+            lightboxImg.style.opacity = '0.5';
+            setTimeout(() => {
+                lightboxImg.src = currentPhotos[currentIndex]; // Lightbox ላይ ሙሉ ጥራት ያለውን ፎቶ ያሳያል
+                lbCurrent.innerText = currentIndex + 1;
+                lightboxImg.style.opacity = '1';
+            }, 150);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if(!lightbox.classList.contains('active')) return;
+            if(e.key === 'ArrowRight') nextPhoto();
+            if(e.key === 'ArrowLeft') prevPhoto();
+            if(e.key === 'Escape') closeLightbox();
+        });
+
+        function showError() {
+            loader.style.display = 'none';
+            errorState.style.display = 'block';
+            albumTitle.innerText = "Access Denied";
+            albumIdDisplay.innerText = "Error 404";
+        }
+
+        fetchTelegramAlbum();
+    </script>
+</body>
+</html>

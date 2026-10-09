@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Book a Service — YAM PICTURES</title>
+<meta name="description" content="Book wedding, event, corporate or equipment-rental services with YAM PICTURES. Requests go directly to our team on WhatsApp.">
+<meta name="theme-color" content="#050505">
+<meta property="og:title" content="Book a Service — YAM PICTURES"><meta property="og:description" content="Book wedding, event, corporate or equipment-rental services with YAM PICTURES. Requests go directly to our team on WhatsApp."><meta property="og:type" content="website"><meta property="og:image" content="assets/yam-logo.png">
+<link rel="icon" type="image/png" href="assets/favicon.png"><link rel="apple-touch-icon" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('yam-theme')||'dark'}catch(e){}</script>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="noise"></div><div class="cursor" id="cursor"></div><div class="progress" id="progress"></div>
+<header id="header"><a class="logo" href="index.html" aria-label="YAM PICTURES — home"><img src="assets/yam-logo.png" alt="YAM PICTURES"></a>
+<nav aria-label="Main"><a href="index.html">Home</a><a href="portfolio.html">Portfolio</a><a href="services.html">Services</a><a href="packages.html">Packages</a><a href="ceremonies.html">Events</a><a href="rentals.html">Rentals</a><a href="gallery-login.html">Client VIP</a><a href="contact.html">Contact</a></nav>
+<div class="tools"><a class="btn primary nav-cta" href="booking.html" style="padding:10px 16px;font-size:10px">Book now</a><button class="tool" id="theme" type="button" aria-label="Toggle theme"></button><button class="tool menu" id="menu" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mnav">☰</button></div></header>
+<div class="mnav" id="mnav"><a href="index.html">Home<small>01</small></a><a href="portfolio.html">Portfolio<small>02</small></a><a href="services.html">Services<small>03</small></a><a href="packages.html">Packages<small>04</small></a><a href="ceremonies.html">Events<small>05</small></a><a href="rentals.html">Rentals<small>06</small></a><a href="gallery-login.html">Client VIP<small>07</small></a><a href="contact.html">Contact<small>08</small></a><a class="btn primary" href="booking.html">Book now ↗</a></div>
+<main id="main"><section class="page-hero"><div class="wrap"><div class="crumbs"><a href="index.html">Home</a><span>/</span><span>Booking</span></div><div class="eyebrow">Book a service</div><h1>Let's create<br><em>together.</em></h1><p class="lead">Tell us about your project. Your request goes straight to our team on WhatsApp, and we get back to you quickly.</p></div></section>
+<section class="section tight wrap"><div class="form-card reveal"><div class="fgrid">
+<div class="fg full"><label for="service">What do you need?</label><select id="service" required><option value="" disabled selected>Select a service…</option><option value="wedding">Wedding / Engagement — Photo &amp; Film</option><option value="event">Event (graduation, birthday, private)</option><option value="corporate">Corporate / Commercial</option><option value="rental">Equipment Rental</option><option value="other">Other photo / video project</option></select><span class="err">Please choose a service.</span></div>
+<div class="fg"><label for="name">Full name</label><input id="name" autocomplete="name" placeholder="E.g. Abebe Kebede" required><span class="err">Please enter your name.</span></div>
+<div class="fg"><label for="phone">Phone / WhatsApp</label><input id="phone" type="tel" autocomplete="tel" placeholder="09…" required><span class="err">Please enter a phone number.</span></div>
+<div class="dyn" id="f-wedding"><div class="fg"><label for="couple">Groom &amp; bride names</label><input id="couple" placeholder="E.g. Abebe &amp; Almaz"></div></div>
+<div class="dyn" id="f-event"><div class="fg"><label for="evtype">Event type</label><input id="evtype" placeholder="Graduation, birthday…"></div></div>
+<div class="dyn" id="f-date"><div class="fg"><label for="date">Date</label><input id="date" type="date"></div></div>
+<div class="fg full" id="wp-wrap"><label for="wedding-plan">Wedding package <em>(optional)</em></label><select id="wedding-plan"><option value="Not sure yet">Not sure yet</option><option value="Essential (35,000 ETB)">Essential — 35,000 ETB</option><option value="Classic (42,000 ETB)">Classic — 42,000 ETB</option><option value="Premium (50,000 ETB)">Premium — 50,000 ETB</option></select></div>
+<div class="dyn" id="f-corporate"><div class="fg"><label for="company">Company / brand</label><input id="company" placeholder="Your brand"></div><div class="fg"><label for="corp-plan">Plan</label><select id="corp-plan"><option>Starter</option><option>Growth</option><option>Enterprise</option><option>Custom</option></select></div></div>
+<div class="dyn" id="f-rental"><div class="fg full" style="grid-column:1/-1"><label for="gear">Gear you need</label><input id="gear" placeholder="Cameras, lenses, sound, lighting…"></div></div>
+<div class="fg full"><label for="details">Additional details <em>(optional)</em></label><textarea id="details" placeholder="Tell us about your vision, location, timing or special requests…"></textarea></div></div>
+<div class="form-actions"><button class="btn primary mag" id="send-wa" type="button">Send via WhatsApp ↗</button><button class="btn mag" id="send-mail" type="button">Send by email</button></div><p class="form-status" role="status" aria-live="polite"></p></div></section></main>
+<footer><div class="wrap"><div class="footer-grid"><div><div class="footer-logo"><img src="assets/yam-logo.png" alt="YAM PICTURES"></div><p class="footer-copy" style="margin-top:18px;max-width:280px">Photography · Cinematography · Post Production.<br>Premium visual storytelling from Ethiopia.</p></div>
+<div><h4>Explore</h4><a href="portfolio.html">Portfolio</a><a href="services.html">Services</a><a href="packages.html">Packages</a><a href="ceremonies.html">Weddings &amp; Events</a><a href="faq.html">FAQ</a></div>
+<div><h4>Studio</h4><a href="booking.html">Book a service</a><a href="rentals.html">Equipment rental</a><a href="gallery-login.html">Client VIP gallery</a><a href="contact.html">Contact</a></div>
+<div><h4>Talk to us</h4><a href="tel:0916608770">0916 60 87 70</a><a href="tel:0964036273">0964 03 62 73</a><a href="tel:0987369195">0987 36 91 95</a><a href="mailto:hello@yampictures.com">hello@yampictures.com</a><span>Ethiopia</span></div></div>
+<div class="footer-bottom"><span>© <span data-year>2026</span> YAM PICTURES. All rights reserved.</span><span>Made for images that move.</span></div></div></footer>
+<a class="wa" href="https://wa.me/251916608770" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.8-2-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.7-1.4-1.6-1.6-1.9-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5-.1-.1-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.7-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.1-.3-.2-.6-.3zM12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2z"/></svg></a>
+<button class="to-top" id="toTop" type="button" aria-label="Back to top">↑</button>
+<script src="assets/app.js"></script>
+<script>
+const $=id=>document.getElementById(id),WA='251916608770';
+const sel=$('service');
+function toggle(){const v=sel.value;$('wp-wrap').style.display=v==='wedding'?'grid':'none';['wedding','corporate','rental','event'].forEach(k=>{const e=$('f-'+k);if(e)e.classList.toggle('show',(k===v)||(k==='event'&&v==='event'))});$('f-date').classList.toggle('show',v==='wedding'||v==='event')}
+sel.addEventListener('change',toggle);
+const p=new URLSearchParams(location.search),sv=p.get('service'),pl=p.get('plan');
+if(sv&&[...sel.options].some(o=>o.value===sv)){sel.value=sv;if(pl){const c=pl[0].toUpperCase()+pl.slice(1);if(sv==='wedding')[...$('wedding-plan').options].forEach((o,i)=>{if(o.text.includes(c))$('wedding-plan').selectedIndex=i});if(sv==='corporate')$('corp-plan').value=c}}
+toggle();
+const st=document.querySelector('.form-status');
+function check(){let ok=true;['service','name','phone'].forEach(id=>{const el=$(id),bad=!el.value.trim();el.closest('.fg').classList.toggle('bad',bad);el.setAttribute('aria-invalid',bad);if(bad)ok=false});return ok}
+function build(){const s=sel.value,L=['*NEW BOOKING REQUEST* 🎬','','Name: '+$('name').value,'Phone: '+$('phone').value,'Service: '+sel.options[sel.selectedIndex].text.replace(/^\S+\s/,'')];
+if(s==='wedding'){L.push('Couple: '+($('couple').value||'-'),'Date: '+($('date').value||'-'),'Package: '+$('wedding-plan').value)}
+if(s==='event'){L.push('Event: '+($('evtype').value||'-'),'Date: '+($('date').value||'-'))}
+if(s==='corporate'){L.push('Company: '+($('company').value||'-'),'Plan: '+$('corp-plan').value)}
+if(s==='rental'){L.push('Gear: '+($('gear').value||'-'))}
+if($('details').value.trim())L.push('','Details:',$('details').value.trim());return L.join('\n')}
+$('send-wa').onclick=()=>{if(!check()){st.className='form-status bad';st.textContent='Please fill in the highlighted required fields.';return}st.className='form-status ok';st.textContent='Opening WhatsApp — press send to complete your request.';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(build()),'_blank','noopener')};
+$('send-mail').onclick=()=>{if(!check()){st.className='form-status bad';st.textContent='Please fill in the highlighted required fields.';return}location.href='mailto:hello@yampictures.com?subject='+encodeURIComponent('Booking request — '+$('name').value)+'&body='+encodeURIComponent(build().replace(/\*/g,''))};
+</script>
+</body>
+</html>
